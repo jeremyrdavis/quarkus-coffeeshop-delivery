@@ -33,7 +33,6 @@ public class Order {
         foods.add("CROISSANT_CHOCOLATE");
     }
 
-
     public OrderInCommand processFavFoodOrder(FavFoodOrder favFoodOrder) {
 
         OrderInCommand orderInCommand = new OrderInCommand();
@@ -41,15 +40,19 @@ public class Order {
 
         favFoodOrder.getLineItems().forEach(favFoodLineItem -> {
             if (beverages.contains(favFoodLineItem.getItem())) {
-                orderInCommand.getBeverages().add(
-                        new LineItem(
+                for(int i = 0;i<favFoodLineItem.getQuantity();i++){
+                    orderInCommand.getBeverages().add(
+                            new LineItem(
                                     translateFavFoodLineItem(favFoodLineItem.getItem()),
                                     favFoodOrder.getCustomerName()));
+                }
             }else if(foods.contains(favFoodLineItem.getItem())){
-                orderInCommand.getKitchenOrders().add(
-                        new LineItem(
-                                translateFavFoodLineItem(favFoodLineItem.getItem()),
-                                favFoodOrder.getCustomerName()));
+                for (int i = 0; i < favFoodLineItem.getQuantity(); i++) {
+                    orderInCommand.getKitchenOrders().add(
+                            new LineItem(
+                                    translateFavFoodLineItem(favFoodLineItem.getItem()),
+                                    favFoodOrder.getCustomerName()));
+                }
             }
         });
         return orderInCommand;

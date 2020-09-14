@@ -27,21 +27,22 @@ public class FavFoodResource {
     Order order;
 
     @Inject
-    @Channel("orders-out")
-    Emitter<OrderInCommand> orderInCommandEmitter;
+    @Channel("orders")
+    Emitter<String> orderInCommandEmitter;
 
     @POST
-    public CompletableFuture<Response> processFavFoodOrder(FavFoodOrder favFoodOrder) {
+    public CompletableFuture<String> processFavFoodOrder(FavFoodOrder favFoodOrder) {
         logger.debug("received {}", favFoodOrder);
         OrderInCommand orderInCommand = order.processFavFoodOrder(favFoodOrder);
         logger.debug("sending {}", orderInCommand);
-        return orderInCommandEmitter.send(orderInCommand)
+        return orderInCommandEmitter.send(jsonb.toJson(orderInCommand))
                 .handle((res, ex) -> {
                     if (ex != null) {
                         logger.error(ex.getMessage());
-                        return Response.serverError().entity(ex).build();
+                        return ex.getMessage();
                     }else{
-                        return Response.accepted().entity(orderInCommand).build();
+                        logger.debug("returning successfully");
+                        return jsonb.toJson(orderInCommand);
                     }
                 }).toCompletableFuture();
     }
